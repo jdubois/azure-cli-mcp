@@ -98,8 +98,16 @@ az ad sp create-for-rbac --name "azure-cli-mcp" --role contributor --scopes /sub
 
 This will create a new Service Principal with the specified name and role, and output the credentials in JSON format.
 
+You can then run the server using Docker with the following command. To authenticate, set the `AZURE_CREDENTIALS` with
+the output of the previous command.
+
+```bash
+docker run --rm -p 8000:8000 -e AZURE_CREDENTIALS="{"clientId":"....","clientSecret":"....",...}" -i ghcr.io/jdubois/azure-cli-mcp:latest
+```
+
 To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file.
-The `AZURE_CREDENTIALS` environment variable should be set to the JSON output from the previous command.
+The `AZURE_CREDENTIALS` environment variable should be set to the JSON output from the Service Principal creation, with
+the quotes escaped.
 
 ```json
 {
