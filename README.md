@@ -136,7 +136,5 @@ To use the server from VS Code Insiders, here are the steps to configure it:
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
   - The configuration above connects to the server using the `stio` transport
-  - If you want to use the `http` transport, the server should be available
-    at [http://localhost:6273/sse](http://localhost:6273/sse)
 - Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
 - On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
