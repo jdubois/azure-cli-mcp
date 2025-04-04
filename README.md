@@ -44,12 +44,13 @@ MCP specification and SDK are more stable.
 
 ## How do I install it?
 
-This MCP server currently only works with the `stdio` transport, so it should run locally on your machine, using your Azure CLI credentials.
-
 _This server can run as a Java application or inside a Docker container._ If Java is installed on your machine, this
 first option is
 probably the easiest one. If you don't have Java installed, or if you want to have something a bit more secure, you can
 use the second option.
+
+For both installations, the `stio` transport and the `http` transports are both available. The HTTP server should be
+available at [http://localhost:6273/sse](http://localhost:6273/sse).
 
 ### Install and configure the server with Java
 
@@ -102,7 +103,7 @@ You can then run the server using Docker with the following command. To authenti
 the output of the previous command.
 
 ```bash
-docker run --rm -p 8000:8000 -e AZURE_CREDENTIALS="{"clientId":"....","clientSecret":"....",...}" -i ghcr.io/jdubois/azure-cli-mcp:latest
+docker run --rm -p 6273:6273 -e AZURE_CREDENTIALS="{"clientId":"....","clientSecret":"....",...}" -i ghcr.io/jdubois/azure-cli-mcp:latest
 ```
 
 To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file.
@@ -134,6 +135,8 @@ To use the server from VS Code Insiders, here are the steps to configure it:
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
+  - The configuration above connects to the server using the `stio` transport
+  - If you want to use the `http` transport, the server should be available
+    at [http://localhost:6273/sse](http://localhost:6273/sse)
 - Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
 - On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
-
