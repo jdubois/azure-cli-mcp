@@ -46,13 +46,24 @@ MCP specification and SDK are more stable.
 
 ## How do I install it?
 
-_This server can run as a Java application or inside a Docker container._ If Java is installed on your machine, this
-first option is
-probably the easiest one. If you don't have Java installed, or if you want to have something a bit more secure, you can
-use the second option.
+_This server can run as a Java application or inside a Docker container._
 
-For both installations, the `stio` transport and the `http` transports are both available. The HTTP server should be
-available at [http://localhost:6273/sse](http://localhost:6273/sse).
+For both installations, only the `stio` transport is available. The `http` transport will be available later.
+
+### Installation with Smithery.ai
+
+You can install the MCP server through Smithery.ai:
+
+[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
+
+This is similar to our Docker container installation below, but runs on Smithery.ai's servers. While this installation
+is initially the easiest, please note that:
+
+- You will need an `AZURE_CREDENTIALS` key, as described below in the Docker installation section, and that this key
+  will be sent to Smithery.ai.
+- Smithery.ai is a third-party service, and you need to trust them to build this MCP server for you (it uses the same
+  Dockerfile as our Docker image, but isn't built by us).
+- This is still an early preview service, so we can't guarantee how it will evolve.
 
 ### Install and configure the server with Java
 
@@ -83,7 +94,7 @@ where you downloaded the `azure-cli-mcp.jar` file.
 }
 ```
 
-To use the server from VS Code Insiders, here are the steps to configure it:
+To use the server from VS Code, here are the steps to configure it:
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
@@ -133,7 +144,7 @@ the quotes escaped.
 }
 ```
 
-To use the server from VS Code Insiders, here are the steps to configure it:
+To use the server from VS Code, here are the steps to configure it:
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
