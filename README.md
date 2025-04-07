@@ -2,6 +2,8 @@
 
 This is an [MCP Server](https://modelcontextprotocol.io) that wraps the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/), adds a nice prompt to improve how it works, and exposes it.
 
+[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
+
 ## Demos
 
 ### Short 2-minute demo with Claude Desktop
