@@ -48,7 +48,7 @@ MCP specification and SDK are more stable.
 
 _This server can run as a Java application or inside a Docker container._
 
-For both installations, only the `stio` transport is available. The `http` transport will be available later.
+For both options, only the `stio` transport is available. The `http` transport will be available later.
 
 ### Installation with Smithery.ai
 
@@ -67,6 +67,8 @@ is initially the easiest, please note that:
 
 ### Install and configure the server with Java
 
+This configuration is running the server locally, using your own Azure credentials.
+
 - Install the Azure CLI: you can do this by following the instructions [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 - Authenticate to your Azure account. You can do this by running `az login` in your terminal.
 - Make sure you have Java 17 or higher installed. You can check this by running `java -version` in your terminal.
@@ -75,6 +77,8 @@ Binaries are available on the [GitHub Release page](https://github.com/jdubois/a
 can download the latest one with the GitHub CLI:
 
 - Download the latest release: `gh release download --repo jdubois/azure-cli-mcp --pattern='azure-cli-mcp.jar'`
+
+#### Using Claude Desktop
 
 To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file. Please note that you
 need to point to the location
@@ -94,10 +98,13 @@ where you downloaded the `azure-cli-mcp.jar` file.
 }
 ```
 
-To use the server from VS Code, here are the steps to configure it:
+#### Using VS Code
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
+  - The configuration connects to the server using the `stio` transport
+  - The command to run is `java -jar ~/Downloads/azure-cli-mcp.jar` (you need to point to the location where you
+    downloaded the `azure-cli-mcp.jar` file)
 - Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
 - On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
 
@@ -118,6 +125,8 @@ the output of the previous command.
 ```bash
 docker run --rm -p 6273:6273 -e AZURE_CREDENTIALS="{"clientId":"....","clientSecret":"....",...}" -i ghcr.io/jdubois/azure-cli-mcp:latest
 ```
+
+#### Using Claude Desktop
 
 To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file.
 The `AZURE_CREDENTIALS` environment variable should be set to the JSON output from the Service Principal creation, with
@@ -144,10 +153,47 @@ the quotes escaped.
 }
 ```
 
-To use the server from VS Code, here are the steps to configure it:
+#### Using VS Code
+
+To use the server from VS Code:
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
-  - The configuration above connects to the server using the `stio` transport
+  - The configuration connects to the server using the `stio` transport
+  - The command to run is `docker run -i --rm -e AZURE_CREDENTIALS ghcr.io/jdubois/azure-cli-mcp:latest`. You'll need to
+    set the `AZURE_CREDENTIALS` environment variable to the JSON output from the Service Principal creation, with the
+    quotes escaped: have a look below for a complete and secure example.
 - Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
 - On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
+
+You can secure the `AZURE_CREDENTIALS` environment using the methode
+described [here](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_configuration-example).
+
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "azure-credentials",
+      "description": "Azure Credentials",
+      "password": true
+    }
+  ],
+  "servers": {
+    "azure-cli": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AZURE_CREDENTIALS",
+        "ghcr.io/jdubois/azure-cli-mcp:latest"
+      ],
+      "env": {
+        "AZURE_CREDENTIALS": "${input:azure-credentials}"
+      }
+    }
+  }
+}
+```
