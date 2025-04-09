@@ -46,67 +46,9 @@ MCP specification and SDK are more stable.
 
 ## How do I install it?
 
-_This server can run as a Java application or inside a Docker container._
+_This server can run inside a Docker container or as a Java executable JAR file._
 
 For both options, only the `stio` transport is available. The `http` transport will be available later.
-
-### Installation with Smithery.ai
-
-You can install the MCP server through Smithery.ai:
-
-[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
-
-This is similar to our Docker container installation below, but runs on Smithery.ai's servers. While this installation
-is initially the easiest, please note that:
-
-- You will need an `AZURE_CREDENTIALS` key, as described below in the Docker installation section, and that this key
-  will be sent to Smithery.ai.
-- Smithery.ai is a third-party service, and you need to trust them to build this MCP server for you (it uses the same
-  Dockerfile as our Docker image, but isn't built by us).
-- This is still an early preview service, so we can't guarantee how it will evolve.
-
-### Install and configure the server with Java
-
-This configuration is running the server locally, using your own Azure credentials.
-
-- Install the Azure CLI: you can do this by following the instructions [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
-- Authenticate to your Azure account. You can do this by running `az login` in your terminal.
-- Make sure you have Java 17 or higher installed. You can check this by running `java -version` in your terminal.
-
-Binaries are available on the [GitHub Release page](https://github.com/jdubois/azure-cli-mcp/releases), here's how you
-can download the latest one with the GitHub CLI:
-
-- Download the latest release: `gh release download --repo jdubois/azure-cli-mcp --pattern='azure-cli-mcp.jar'`
-
-#### Using Claude Desktop
-
-To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file. Please note that you
-need to point to the location
-where you downloaded the `azure-cli-mcp.jar` file.
-
-```json
-{
-    "mcpServers": {
-        "azure-cli": {
-            "command": "java",
-            "args": [
-                "-jar",
-              "~/Downloads/azure-cli-mcp.jar"
-            ]
-        }
-    }
-}
-```
-
-#### Using VS Code
-
-- Install GitHub Copilot
-- Install this MCP Server using the command palette: `MCP: Add Server...`
-  - The configuration connects to the server using the `stio` transport
-  - The command to run is `java -jar ~/Downloads/azure-cli-mcp.jar` (you need to point to the location where you
-    downloaded the `azure-cli-mcp.jar` file)
-- Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
-- On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
 
 ### Install and configure the server with Docker
 
@@ -124,6 +66,52 @@ the output of the previous command.
 
 ```bash
 docker run --rm -p 6273:6273 -e AZURE_CREDENTIALS="{"clientId":"....","clientSecret":"....",...}" -i ghcr.io/jdubois/azure-cli-mcp:latest
+```
+
+#### Using VS Code
+
+To use the server from VS Code:
+
+- Install GitHub Copilot
+- Install this MCP Server using the command palette: `MCP: Add Server...`
+  - The configuration connects to the server using the `stio` transport
+  - The command to run is `docker run -i --rm -e AZURE_CREDENTIALS ghcr.io/jdubois/azure-cli-mcp:latest`. You'll need to
+    set the `AZURE_CREDENTIALS` environment variable to the JSON output from the Service Principal creation, with the
+    quotes escaped: have a look below for a complete and secure example.
+- Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
+- On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
+
+You can secure the `AZURE_CREDENTIALS` environment using the methode
+described [in the documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_configuration-example),
+here is a complete example:
+
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "azure-credentials",
+      "description": "Azure Credentials",
+      "password": true
+    }
+  ],
+  "servers": {
+    "azure-cli": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AZURE_CREDENTIALS",
+        "ghcr.io/jdubois/azure-cli-mcp:latest"
+      ],
+      "env": {
+        "AZURE_CREDENTIALS": "${input:azure-credentials}"
+      }
+    }
+  }
+}
 ```
 
 #### Using Claude Desktop
@@ -153,47 +141,60 @@ the quotes escaped.
 }
 ```
 
-#### Using VS Code
+### Installation with Smithery.ai
 
-To use the server from VS Code:
+You can install the MCP server through Smithery.ai:
+
+[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
+
+This is similar to our Docker container installation above, but runs on Smithery.ai's servers. While this installation
+is initially the easiest, please note that:
+
+- You will need an `AZURE_CREDENTIALS` key, as described below in the Docker installation section, and this key
+  will be sent to Smithery.ai.
+- Smithery.ai is a third-party service, and you need to trust them to build this MCP server for you (it uses the same
+  Dockerfile as our Docker image, but isn't built by us).
+- This is still an early preview service, so we can't guarantee how it will evolve.
+
+### Install and configure the server with Java
+
+This configuration is running the server locally. It's easier to set up than with Docker,
+but it's less secured as it uses directly your credentials using the Azure CLI configured on your machine.
+
+- Install the Azure CLI: you can do this by following the instructions [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+- Authenticate to your Azure account. You can do this by running `az login` in your terminal.
+- Make sure you have Java 17 or higher installed. You can check this by running `java -version` in your terminal.
+
+Binaries are available on the [GitHub Release page](https://github.com/jdubois/azure-cli-mcp/releases), here's how you
+can download the latest one with the GitHub CLI:
+
+- Download the latest release: `gh release download --repo jdubois/azure-cli-mcp --pattern='azure-cli-mcp.jar'`
+
+#### Using VS Code
 
 - Install GitHub Copilot
 - Install this MCP Server using the command palette: `MCP: Add Server...`
   - The configuration connects to the server using the `stio` transport
-  - The command to run is `docker run -i --rm -e AZURE_CREDENTIALS ghcr.io/jdubois/azure-cli-mcp:latest`. You'll need to
-    set the `AZURE_CREDENTIALS` environment variable to the JSON output from the Service Principal creation, with the
-    quotes escaped: have a look below for a complete and secure example.
+  - The command to run is `java -jar ~/Downloads/azure-cli-mcp.jar` (you need to point to the location where you
+    downloaded the `azure-cli-mcp.jar` file)
 - Configure GitHub Copilot to run in `Agent` mode, by clicking on the arrow at the bottom of the the chat window
 - On top of the chat window, you should see the `azure-cli-mcp` server configured as a tool
 
-You can secure the `AZURE_CREDENTIALS` environment using the methode
-described [here](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_configuration-example).
+#### Using Claude Desktop
+
+To use the server from Claude Desktop, add the server to your `claude_desktop_config.json` file. Please note that you
+need to point to the location where you downloaded the `azure-cli-mcp.jar` file.
 
 ```json
 {
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "azure-credentials",
-      "description": "Azure Credentials",
-      "password": true
+    "mcpServers": {
+        "azure-cli": {
+            "command": "java",
+            "args": [
+                "-jar",
+              "~/Downloads/azure-cli-mcp.jar"
+            ]
+        }
     }
-  ],
-  "servers": {
-    "azure-cli": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "AZURE_CREDENTIALS",
-        "ghcr.io/jdubois/azure-cli-mcp:latest"
-      ],
-      "env": {
-        "AZURE_CREDENTIALS": "${input:azure-credentials}"
-      }
-    }
-  }
 }
 ```
