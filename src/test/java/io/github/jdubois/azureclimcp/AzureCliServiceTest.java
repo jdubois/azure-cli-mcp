@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class AzureCliServiceTest {
@@ -19,7 +20,7 @@ class AzureCliServiceTest {
 
         // Mock the process behavior
         Process mockProcess = mock(Process.class);
-        String mockOutput = "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ABCDEFG to authenticate.\n";
+        String mockOutput = "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ERAL5J27G to authenticate.\n";
         InputStream mockInputStream = new ByteArrayInputStream(mockOutput.getBytes());
 
         doReturn(mockInputStream).when(mockProcess).getInputStream();
@@ -34,9 +35,14 @@ class AzureCliServiceTest {
         // Act
         String result = azureCliService.handleAzLoginCommand(command);
 
+        // verify that azureCliService.handleAzAuthSuccess() is called
+        verify(azureCliService, times(1)).handleAzAuthSuccess();
+        // verify that azureCliService.handleAzAuthFailure() is not called
+        verify(azureCliService, never()).handleAzAuthFailure(any());
+
         // Assert
         assertEquals(
-            "To sign in, open the URL: https://microsoft.com/devicelogin and enter the code: ABCDEFG to authenticate.",
+            "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ERAL5J27G to authenticate.",
             result
         );
     }

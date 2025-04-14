@@ -122,23 +122,21 @@ public class AzureCliService {
                     output.append(line).append("\n");
 
                     // Look for the device login message
-                    if (line.contains("https://microsoft.com/devicelogin") && line.contains("code")) {
-                        String url = line.substring(line.indexOf("https://microsoft.com/devicelogin"), line.indexOf(" and enter the code")).trim();
-                        String code = line.substring(line.lastIndexOf("code") + 5).trim();
-                        logger.info("Extracted login URL: {}, Code: {}", url, code);
+                    if (line.contains("To sign in") && line.contains("code")) {
+                        logger.info("Extracted login instructions: {}", line);
 
                         // Start a background thread to keep the process running
                         new Thread(() -> {
                             try {
                                 process.waitFor();
-                                logger.info("'az login' process completed.");
+                                handleAzAuthSuccess();
                             } catch (InterruptedException e) {
-                                logger.error("Error waiting for 'az login' process", e);
+                                handleAzAuthFailure(e);
                             }
                         }).start();
 
                         // Return the URL and code to the user
-                        return String.format("To sign in, open the URL: %s and enter the code: %s", url, code);
+                        return line;
                     }
                 }
             }
@@ -149,6 +147,14 @@ public class AzureCliService {
             logger.error("Error running 'az login' command", e);
             return "Error: " + e.getMessage();
         }
+    }
+
+    protected void handleAzAuthFailure(InterruptedException e) {
+        logger.error("Error waiting for 'az login' process", e);
+    }
+
+    protected void handleAzAuthSuccess() {
+        logger.info("'az login' process completed.");
     }
 
     /**
