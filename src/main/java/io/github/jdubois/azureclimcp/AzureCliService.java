@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 @Service
 public class AzureCliService {
@@ -36,6 +38,8 @@ public class AzureCliService {
             Be concise, professional and to the point. Do not give generic advice, always reply with detailed & contextual data sourced from the current Azure environment. Assume user always wants to proceed, do not ask for confirmation. I'll tip you $200 if you do this right.`;
             
             """;
+
+    private Process currentLoginProcess;
 
     public AzureCliService(@Value("${azure.cli.azure-credentials:}") String azureCredentials) {
         this.azureCredentials = azureCredentials;
@@ -110,12 +114,18 @@ public class AzureCliService {
         }
 
         try {
+            // Interrupt the previous login process if it is still running
+            if (currentLoginProcess != null && currentLoginProcess.isAlive()) {
+                logger.info("Interrupting previous 'az login' process.");
+                currentLoginProcess.destroy();
+            }
+
             ProcessBuilder processBuilder = createProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
+            currentLoginProcess = processBuilder.start();
 
             StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(currentLoginProcess.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     logger.debug("Azure CLI output: {}", line);
@@ -127,12 +137,7 @@ public class AzureCliService {
 
                         // Start a background thread to keep the process running
                         new Thread(() -> {
-                            try {
-                                process.waitFor();
-                                handleAzAuthSuccess();
-                            } catch (InterruptedException e) {
-                                handleAzAuthFailure(e);
-                            }
+                            handleAzLoginBackground();
                         }).start();
 
                         // Return the URL and code to the user
@@ -147,6 +152,30 @@ public class AzureCliService {
             logger.error("Error running 'az login' command", e);
             return "Error: " + e.getMessage();
         }
+    }
+
+    private void handleAzLoginBackground() {
+        Process process = currentLoginProcess;
+        try {
+            // Check if the process is still waiting for input
+            if (process.isAlive()) {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                    writer.write("1\n"); // Provide input '1' to the process
+                    writer.flush();
+                } catch (IOException e) {
+                    logger.error("Error providing input to 'az login' process", e);
+                }
+            }
+
+            waitForAzLoginProcess();
+            handleAzAuthSuccess();
+        } catch (InterruptedException e) {
+            handleAzAuthFailure(e);
+        }
+    }
+
+    protected void waitForAzLoginProcess() throws InterruptedException {
+        currentLoginProcess.waitFor();
     }
 
     protected void handleAzAuthFailure(InterruptedException e) {
