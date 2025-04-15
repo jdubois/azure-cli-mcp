@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +36,6 @@ public class AzureLoginHandlerTest {
         doReturn(processBuilder).when(azureLoginHandler).createProcessBuilder(anyString());
         when(processBuilder.redirectErrorStream(anyBoolean())).thenReturn(processBuilder);
         when(processBuilder.start()).thenReturn(process);
-        
-        // Setup the Process mock - only stub what's needed for all tests
-        //when(process.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -52,10 +49,6 @@ public class AzureLoginHandlerTest {
         doReturn(true, false).when(process).isAlive();
         doNothing().when(azureLoginHandler).waitForAzLoginProcess();
         doNothing().when(azureLoginHandler).handleAzAuthSuccess();
-        
-        // Mock the process output stream for this test
-        //OutputStream outputStream = mock(OutputStream.class);
-        //when(process.getOutputStream()).thenReturn(outputStream);
         
         // Execute the method
         String result = azureLoginHandler.handleAzLoginCommand("az login --use-device-code");
@@ -79,10 +72,6 @@ public class AzureLoginHandlerTest {
         doNothing().when(azureLoginHandler).waitForAzLoginProcess();
         doNothing().when(azureLoginHandler).handleAzAuthSuccess();
         
-        // Mock the process output stream for this test
-        OutputStream outputStream = mock(OutputStream.class);
-//        when(process.getOutputStream()).thenReturn(outputStream);
-        
         // Execute the method with a command that doesn't include the --use-device-code flag
         String result = azureLoginHandler.handleAzLoginCommand("az login");
         
@@ -96,26 +85,17 @@ public class AzureLoginHandlerTest {
     @Test
     public void testHandleAzLoginCommand_InterruptsOngoingProcess() throws Exception {
         // Setup a field with reflection to simulate an ongoing process
-        java.lang.reflect.Field field = AzureLoginHandler.class.getDeclaredField("currentLoginProcess");
-        field.setAccessible(true);
+        Field currentLoginProcessField = AzureLoginHandler.class.getDeclaredField("currentLoginProcess");
+        currentLoginProcessField.setAccessible(true);
         
         Process mockExistingProcess = mock(Process.class);
         when(mockExistingProcess.isAlive()).thenReturn(true);
-        field.set(azureLoginHandler, mockExistingProcess);
+        currentLoginProcessField.set(azureLoginHandler, mockExistingProcess);
         
         // Prepare test data for the new process
         String loginMessage = "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ABCDEFG to authenticate.";
         InputStream inputStream = new ByteArrayInputStream(loginMessage.getBytes(StandardCharsets.UTF_8));
         when(process.getInputStream()).thenReturn(inputStream);
-        
-        // For this test, we need these specific mocks for the background thread
-        //doReturn(true, false).when(process).isAlive();
-//        doNothing().when(azureLoginHandler).waitForAzLoginProcess();
-//        doNothing().when(azureLoginHandler).handleAzAuthSuccess();
-        
-        // Mock the process output stream for this test
-        OutputStream outputStream = mock(OutputStream.class);
-        //when(process.getOutputStream()).thenReturn(outputStream);
         
         // Execute the method
         azureLoginHandler.handleAzLoginCommand("az login --use-device-code");
