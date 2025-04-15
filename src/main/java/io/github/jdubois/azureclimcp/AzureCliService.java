@@ -156,6 +156,7 @@ public class AzureCliService {
 
     private void handleAzLoginBackground() {
         Process process = currentLoginProcess;
+        logger.info("Handling 'az login' process in the background.");
         try {
             // Check if the process is still waiting for input
             if (process.isAlive()) {
