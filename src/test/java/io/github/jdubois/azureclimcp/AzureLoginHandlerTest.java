@@ -44,18 +44,13 @@ public class AzureLoginHandlerTest {
         String loginMessage = "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ABCDEFG to authenticate.";
         InputStream inputStream = new ByteArrayInputStream(loginMessage.getBytes(StandardCharsets.UTF_8));
         when(process.getInputStream()).thenReturn(inputStream);
-        
-        // For this test, we need these specific mocks for the background thread
-        doReturn(true, false).when(process).isAlive();
-        doNothing().when(azureLoginHandler).waitForAzLoginProcess();
-        doNothing().when(azureLoginHandler).handleAzAuthSuccess();
-        
+
         // Execute the method
         String result = azureLoginHandler.handleAzLoginCommand("az login --use-device-code");
-        
+
         // Verify the result contains the login message
         assertEquals(loginMessage, result);
-        
+
         // Verify the process was started
         verify(processBuilder).start();
     }
@@ -66,18 +61,13 @@ public class AzureLoginHandlerTest {
         String loginMessage = "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ABCDEFG to authenticate.";
         InputStream inputStream = new ByteArrayInputStream(loginMessage.getBytes(StandardCharsets.UTF_8));
         when(process.getInputStream()).thenReturn(inputStream);
-        
-        // For this test, we need these specific mocks for the background thread
-        doReturn(true, false).when(process).isAlive();
-        doNothing().when(azureLoginHandler).waitForAzLoginProcess();
-        doNothing().when(azureLoginHandler).handleAzAuthSuccess();
-        
+
         // Execute the method with a command that doesn't include the --use-device-code flag
         String result = azureLoginHandler.handleAzLoginCommand("az login");
-        
+
         // Verify the process was started with the correct command
         verify(azureLoginHandler).createProcessBuilder("az login --use-device-code");
-        
+
         // Verify the result contains the login message
         assertEquals(loginMessage, result);
     }
