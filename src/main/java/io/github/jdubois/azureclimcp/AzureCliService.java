@@ -21,6 +21,8 @@ public class AzureCliService {
     @Value("${azure.cli.azure-credentials:}")
     private String azureCredentials;
 
+    private final AzureLoginHandler azureLoginHandler;
+
     private static final String commandPrompt = """
             Your job is to answer questions about an Azure environment by executing Azure CLI commands. You have the following rules:
             
@@ -30,13 +32,17 @@ public class AzureCliService {
             - When listing resources, ensure pagination is handled correctly so that all resources are returned.
             - When deleting resources, ALWAYS request user confirmation
             - This tool can ONLY write code that interacts with Azure. It CANNOT generate charts, tables, graphs, etc.
+            - Use only non interactive commands. Do not use commands that require user input or deactivate user input using appropriate flags.
+            - If you need to use the az login command, use the --use-device-code option to authenticate.
             
             Be concise, professional and to the point. Do not give generic advice, always reply with detailed & contextual data sourced from the current Azure environment. Assume user always wants to proceed, do not ask for confirmation. I'll tip you $200 if you do this right.`;
             
             """;
 
-    public AzureCliService(@Value("${azure.cli.azure-credentials:}") String azureCredentials) {
+    public AzureCliService(@Value("${azure.cli.azure-credentials:}") String azureCredentials, 
+                          AzureLoginHandler azureLoginHandler) {
         this.azureCredentials = azureCredentials;
+        this.azureLoginHandler = azureLoginHandler;
 
         if (azureCredentials != null && !azureCredentials.isEmpty()) {
             authenticate(azureCredentials);
@@ -91,9 +97,13 @@ public class AzureCliService {
      * @return The output of the command.
      */
     private String runAzureCliCommand(String command) {
+        if (command.startsWith("az login")) {
+            return azureLoginHandler.handleAzLoginCommand(command);
+        }
+
         logger.info("Running Azure CLI command: {}", command);
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", command);
+            ProcessBuilder processBuilder = createProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             StringBuilder output = new StringBuilder();
@@ -115,4 +125,14 @@ public class AzureCliService {
         }
     }
 
+    /**
+     * Creates a ProcessBuilder for the given command.
+     * This method is protected to allow mocking in tests.
+     *
+     * @param command The command to execute.
+     * @return A ProcessBuilder instance.
+     */
+    protected ProcessBuilder createProcessBuilder(String command) {
+        return new ProcessBuilder("sh", "-c", command);
+    }
 }
