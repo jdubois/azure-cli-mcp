@@ -16,13 +16,13 @@ import java.io.OutputStreamWriter;
  */
 @Component
 public class AzureLoginHandler {
-    
+
     private final Logger logger = LoggerFactory.getLogger(AzureLoginHandler.class);
     private Process currentLoginProcess;
 
     /**
      * Handles the special case for the 'az login' command.
-     * 
+     * <p>
      * If command starts with "az login", we need special handling:
      * 1. Ensure the "--use-device-code" flag is present
      * 2. Extract the URL and code for device login
@@ -62,9 +62,7 @@ public class AzureLoginHandler {
                         logger.info("Extracted login instructions: {}", line);
 
                         // Start a background thread to keep the process running
-                        new Thread(() -> {
-                            handleAzLoginBackground();
-                        }).start();
+                        new Thread(this::handleAzLoginBackground).start();
 
                         // Return the URL and code to the user
                         return line;

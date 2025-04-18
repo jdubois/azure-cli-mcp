@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,8 @@ public class AzureCliService {
 
     @Value("${azure.cli.azure-credentials:}")
     private String azureCredentials;
-    
-    @Autowired
-    private AzureLoginHandler azureLoginHandler;
+
+    private final AzureLoginHandler azureLoginHandler;
 
     private static final String commandPrompt = """
             Your job is to answer questions about an Azure environment by executing Azure CLI commands. You have the following rules:
