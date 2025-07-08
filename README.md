@@ -1,5 +1,8 @@
 # Azure CLI MCP Server
 
+> [!IMPORTANT]
+> The @Azure organization offers an official MCP server. You can find more details at its [Getting started documentation](https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started) or the [Azure MCP Server repo](https://github.com/Azure/azure-mcp).
+
 This is an [MCP Server](https://modelcontextprotocol.io) that wraps the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/), adds a nice prompt to improve how it works, and exposes it.
 
 [![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
