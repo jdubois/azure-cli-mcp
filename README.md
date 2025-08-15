@@ -5,6 +5,7 @@ The Azure CLI MCP Server is an [MCP Server](https://modelcontextprotocol.io) tha
 > [!IMPORTANT]
 > The @Azure organization offers an official Azure MCP server, which uses the code from this Azure CLI MCP server. As it's an official server, maintained by Microsoft, we recommend to use it unless you have specific resource contraints (the Azure CLI MCP Server uses less resources as it does less, and as it can be packaged with GraalVM), or if you're a Java developer and want to tweak the prompts. You can find more details at its [Getting started documentation](https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started) or at the [Azure MCP Server repository](https://github.com/Azure/azure-mcp).
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/jdubois/azure-cli-mcp)](https://archestra.ai/mcp-catalog/jdubois__azure-cli-mcp)
 [![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
 
 ## Demos
