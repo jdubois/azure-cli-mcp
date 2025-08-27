@@ -5,8 +5,6 @@ The Azure CLI MCP Server is an [MCP Server](https://modelcontextprotocol.io) tha
 > [!IMPORTANT]
 > The @Azure organization offers an official Azure MCP server, which uses the code from this Azure CLI MCP server. As it's an official server, maintained by Microsoft, we recommend to use it unless you have specific resource contraints (the Azure CLI MCP Server uses less resources as it does less, and as it can be packaged with GraalVM), or if you're a Java developer and want to tweak the prompts. You can find more details at its [Getting started documentation](https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started) or at the [Azure MCP Server repository](https://github.com/Azure/azure-mcp).
 
-[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
-
 ## Demos
 
 ### Short 2-minute demo with Claude Desktop
@@ -92,21 +90,6 @@ with Maven:
 ```bash
 mvn spring-boot:run
 ```
-
-### Installation with Smithery.ai
-
-You can install the MCP server through Smithery.ai:
-
-[![smithery badge](https://smithery.ai/badge/@jdubois/azure-cli-mcp)](https://smithery.ai/server/@jdubois/azure-cli-mcp)
-
-This is similar to our Docker container installation above, but runs on Smithery.ai's servers. While this installation
-is initially the easiest, please note that:
-
-- You will need an `AZURE_CREDENTIALS` key, as described below in the Docker installation section, and this key
-  will be sent to Smithery.ai.
-- Smithery.ai is a third-party service, and you need to trust them to build this MCP server for you (it uses the same
-  Dockerfile as our Docker image, but isn't built by us).
-- This is still an early preview service, so we can't guarantee how it will evolve.
 
 ## Using the MCP Server from VS Code
 
