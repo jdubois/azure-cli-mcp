@@ -1,9 +1,13 @@
 # Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
-
+runtime: "container"
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
+env:
+  SERVER_PORT: "8080"
 startCommand:
-  type: stdio
+  type: "http"
   configSchema:
-    # JSON Schema defining the configuration options for the MCP.
     type: object
     required:
       - azureCredentials
@@ -11,7 +15,5 @@ startCommand:
       azureCredentials:
         type: string
         description: The Azure Credentials in JSON format.
-  commandFunction:
-    # A function that produces the CLI command to start the MCP on stdio.
-    |-
-    config => ({ command: '/app/azure-cli-mcp', args: [], env: { AZURE_CREDENTIALS: config.azureCredentials } })
+  exampleConfig:
+    azureCredentials: "{\"clientId\":\"xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxx\",...}"
